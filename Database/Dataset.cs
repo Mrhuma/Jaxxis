@@ -42,21 +42,6 @@ namespace Jaxxis.Database
             public ITable<User> Userlist { get { return GetTable<User>(); } }
         }
 
-        public static void Test()
-        {
-            using (var db = new DbJaxxis())
-            {
-                var query = from p in db.Guildlist
-                            where p.Usercount != 0
-                            select p;
-
-                foreach (var p in query)
-                {
-                    Console.WriteLine(p.Guildname);
-                }
-            }
-        }
-
         public static void CreateGuildList()
         {
             using (var db = new DbJaxxis())
@@ -133,6 +118,20 @@ namespace Jaxxis.Database
                         {
                             Username = user.Username,
                         });
+            }
+        }
+
+        public static void IsActiveFalse()
+        {
+            using (var db = new DbJaxxis())
+            {
+                db
+                    .GetTable<Guild>()
+                    .Where(t => t.Guildid != "")
+                    .Update(t => new Guild
+                    {
+                        IsActive = false,
+                    });
             }
         }
 

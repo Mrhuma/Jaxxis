@@ -23,5 +23,13 @@ namespace Jaxxis
             isFirstLaunch = hiddenData.IsFirstLaunch;
             botToken = hiddenData.BotToken;
         }
+
+        public static void ColoredConsoleMessage(string msg, ConsoleColor color)
+        {
+            var cc = Console.ForegroundColor;
+            Console.ForegroundColor = color;
+            Console.WriteLine(DateTime.Now + ": " + msg);
+            Console.ForegroundColor = cc;
+        }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using LinqToDB;
+using System.Reflection;
 using System.Threading.Tasks;
 using System;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,8 +21,7 @@ namespace Jaxxis
         private DiscordSocketClient client;
         private IServiceProvider services;
 
-        //Initialize global variables
-        //Start up bot
+        //Start up bot - Initialize global vars
         static void Main(string[] args)
         {
             Global.Initialize();
@@ -29,20 +29,17 @@ namespace Jaxxis
             //Run firstTimeLaunch if this is the first time the bot has been launched
             if (Global.isFirstLaunch)
             {
-                var cc = Console.ForegroundColor;
-
                 if (FirstTimeLaunch())
                 {
-                    Console.ForegroundColor = ConsoleColor.Green;
-                    Console.WriteLine("FirstTimeLaunch was successfull!");
+                    string msg = "FirstTimeLaunch was successfull!";
+                    Global.ColoredConsoleMessage(msg, ConsoleColor.Green);
                 }
                 else
                 {
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine("FirstTimeLaunch was NOT successfull!");
+                    string msg = "FirstTimeLaunch was NOT successfull!";
+                    Global.ColoredConsoleMessage(msg, ConsoleColor.Red);
                 }
 
-                Console.ForegroundColor = cc;
                 Global.isFirstLaunch = false;
                 //hiddenData.isFirstLaunch = false;
 
@@ -71,6 +68,7 @@ namespace Jaxxis
             client.JoinedGuild += JoinedGuild;
             client.UserJoined += UserJoined;
             client.UserLeft += UserLeft;
+            client.LeftGuild += LeftGuild;
 
             await InstallCommands();
 
@@ -160,20 +158,69 @@ namespace Jaxxis
         //Bot is connected and ready
         public Task Ready()
         {
-            foreach (SocketGuild g in client.Guilds)
+            try
+            {
+                Dataset.IsActiveFalse();
+
+                foreach (SocketGuild g in client.Guilds)
+                {
+                    Dataset.Guild newGuild = new Dataset.Guild
+                    {
+                        Guildid = g.Id.ToString(),
+                        Guildname = g.Name,
+                        Usercount = g.Users.Count,
+                        IsActive = true,
+                    };
+
+                    Dataset.GuildInsertOrUpdate(newGuild);
+
+                    foreach (SocketGuildUser u in g.Users)
+                    {
+                        if (u.IsBot)
+                        {
+                            continue;
+                        }
+
+                        Dataset.User newUser = new Dataset.User
+                        {
+                            UserID = u.Id.ToString(),
+                            Username = u.Username,
+                        };
+
+                        Dataset.UserInsertOrUpdate(newUser);
+                    }
+                }
+            }
+            catch (LinqToDBException ex)
+            {
+                Global.ColoredConsoleMessage(ex.Message, ConsoleColor.Red);
+            }
+            catch (Exception ex)
+            {
+                Global.ColoredConsoleMessage(ex.Message, ConsoleColor.Red);
+            }
+
+            return Task.CompletedTask;
+        }
+
+        //Bot has been added to a guild
+        public Task JoinedGuild(SocketGuild g)
+        {
+            try
             {
                 Dataset.Guild newGuild = new Dataset.Guild
                 {
                     Guildid = g.Id.ToString(),
                     Guildname = g.Name,
-                    Usercount = g.Users.Count
+                    Usercount = g.Users.Count,
+                    IsActive = true,
                 };
 
                 Dataset.GuildInsertOrUpdate(newGuild);
 
                 foreach (SocketGuildUser u in g.Users)
                 {
-                    if(u.IsBot)
+                    if (u.IsBot)
                     {
                         continue;
                     }
@@ -187,26 +234,36 @@ namespace Jaxxis
                     Dataset.UserInsertOrUpdate(newUser);
                 }
             }
+            catch (LinqToDBException ex)
+            {
+                Global.ColoredConsoleMessage(ex.Message, ConsoleColor.Red);
+            }
+            catch (Exception ex)
+            {
+                Global.ColoredConsoleMessage(ex.Message, ConsoleColor.Red);
+            }
+
             return Task.CompletedTask;
         }
 
-        //Bot has been added to a guild
-        public Task JoinedGuild(SocketGuild g)
+        //User has joined a guild
+        public Task UserJoined(SocketGuildUser u)
         {
-            Dataset.Guild newGuild = new Dataset.Guild
+            try
             {
-                Guildid = g.Id.ToString(),
-                Guildname = g.Name,
-                Usercount = g.Users.Count
-            };
+                Dataset.Guild newGuild = new Dataset.Guild
+                {
+                    Guildid = u.Guild.Id.ToString(),
+                    Guildname = u.Guild.Name,
+                    Usercount = u.Guild.Users.Count,
+                    IsActive = true
+                };
 
-            Dataset.GuildInsertOrUpdate(newGuild);
+                Dataset.GuildInsertOrUpdate(newGuild);
 
-            foreach (SocketGuildUser u in g.Users)
-            {
                 if (u.IsBot)
                 {
-                    continue;
+                    return Task.CompletedTask;
                 }
 
                 Dataset.User newUser = new Dataset.User
@@ -217,34 +274,14 @@ namespace Jaxxis
 
                 Dataset.UserInsertOrUpdate(newUser);
             }
-
-            return Task.CompletedTask;
-        }
-
-        //User has joined a guild
-        public Task UserJoined(SocketGuildUser u)
-        {
-            Dataset.Guild newGuild = new Dataset.Guild
+            catch (LinqToDBException ex)
             {
-                Guildid = u.Guild.Id.ToString(),
-                Guildname = u.Guild.Name,
-                Usercount = u.Guild.Users.Count,
-            };
-
-            Dataset.GuildInsertOrUpdate(newGuild);
-
-            if (u.IsBot)
-            {
-                return Task.CompletedTask;
+                Global.ColoredConsoleMessage(ex.Message, ConsoleColor.Red);
             }
-
-            Dataset.User newUser = new Dataset.User
+            catch (Exception ex)
             {
-                UserID = u.Id.ToString(),
-                Username = u.Username,
-            };
-
-            Dataset.UserInsertOrUpdate(newUser);
+                Global.ColoredConsoleMessage(ex.Message, ConsoleColor.Red);
+            }
 
             return Task.CompletedTask;
         }
@@ -252,6 +289,21 @@ namespace Jaxxis
         //User has left a guild
         public Task UserLeft(SocketGuildUser u)
         {
+            return Task.CompletedTask;
+        }
+
+        public Task LeftGuild (SocketGuild g)
+        {
+            Dataset.Guild newGuild = new Dataset.Guild
+            {
+                Guildid = g.Id.ToString(),
+                Guildname = g.Name,
+                Usercount = g.Users.Count,
+                IsActive = false,
+            };
+
+            Dataset.GuildInsertOrUpdate(newGuild);
+
             return Task.CompletedTask;
         }
     }
