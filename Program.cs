@@ -10,9 +10,9 @@ using Jaxxis.Database;
 
 namespace Jaxxis
 {
-    /*TODO
-     * Strawpolls
-     * Siege Statistics
+    /* TODO
+     *  - Strawpolls
+     *  - Siege Statistics
      */
 
     public class Program
@@ -21,23 +21,24 @@ namespace Jaxxis
         private DiscordSocketClient client;
         private IServiceProvider services;
 
-        //Start up bot - Initialize global vars
+        //Start up bot
         static void Main(string[] args)
         {
+            //Init Global vars
             Global.Initialize();
 
-            //Run firstTimeLaunch if this is the first time the bot has been launched
+            //Run FirstTimeLaunch if this is the first time the bot has been launched
             if (Global.isFirstLaunch)
             {
                 if (FirstTimeLaunch())
                 {
-                    string msg = "FirstTimeLaunch was successfull!";
-                    Global.ColoredConsoleMessage(msg, ConsoleColor.Green);
+                    string msg = " The first time launch completed successfully!";
+                    Global.LogMessage(msg, Severity.SUCCESS);
                 }
                 else
                 {
-                    string msg = "FirstTimeLaunch was NOT successfull!";
-                    Global.ColoredConsoleMessage(msg, ConsoleColor.Red);
+                    string msg = "The first time launch was not successfully completed.";
+                    Global.LogMessage(msg, Severity.ERROR);
                 }
 
                 Global.isFirstLaunch = false;
@@ -146,8 +147,16 @@ namespace Jaxxis
                 Dataset.CreateGuildList();
                 Dataset.CreateUserList();
             }
-            catch
+
+            catch (LinqToDBException ex)
             {
+                Global.LogMessage(ex.Message, Severity.ERROR);
+                return false;
+            }
+
+            catch (Exception ex)
+            {
+                Global.LogMessage(ex.Message, Severity.ERROR);
                 return false;
             }
 
@@ -158,6 +167,7 @@ namespace Jaxxis
         //Bot is connected and ready
         public Task Ready()
         {
+            //Updates DB tables with guild/user info
             try
             {
                 Dataset.IsActiveFalse();
@@ -169,7 +179,6 @@ namespace Jaxxis
                         Guildid = g.Id.ToString(),
                         Guildname = g.Name,
                         Usercount = g.Users.Count,
-                        IsActive = true,
                     };
 
                     Dataset.GuildInsertOrUpdate(newGuild);
@@ -193,11 +202,11 @@ namespace Jaxxis
             }
             catch (LinqToDBException ex)
             {
-                Global.ColoredConsoleMessage(ex.Message, ConsoleColor.Red);
+                Global.LogMessage(ex.Message, Severity.ERROR);
             }
             catch (Exception ex)
             {
-                Global.ColoredConsoleMessage(ex.Message, ConsoleColor.Red);
+                Global.LogMessage(ex.Message, Severity.ERROR);
             }
 
             return Task.CompletedTask;
@@ -233,14 +242,48 @@ namespace Jaxxis
 
                     Dataset.UserInsertOrUpdate(newUser);
                 }
+
+                Global.LogMessage($"I have been added to the {g.Name} Guild.", Severity.INFO);
             }
+
             catch (LinqToDBException ex)
             {
-                Global.ColoredConsoleMessage(ex.Message, ConsoleColor.Red);
+                Global.LogMessage(ex.Message, Severity.ERROR);
             }
+
             catch (Exception ex)
             {
-                Global.ColoredConsoleMessage(ex.Message, ConsoleColor.Red);
+                Global.LogMessage(ex.Message, Severity.ERROR);
+            }
+
+            return Task.CompletedTask;
+        }
+
+        //Bot has been kicked from a guild.
+        public Task LeftGuild(SocketGuild g)
+        {
+            try
+            {
+                Dataset.Guild newGuild = new Dataset.Guild
+                {
+                    Guildid = g.Id.ToString(),
+                    Guildname = g.Name,
+                    Usercount = g.Users.Count,
+                    IsActive = false,
+                };
+
+                Dataset.GuildInsertOrUpdate(newGuild);
+                Global.LogMessage($"I have been kicked from the {g.Name} Guild.", Severity.INFO);
+            }
+
+            catch (LinqToDBException ex)
+            {
+                Global.LogMessage(ex.Message, Severity.ERROR);
+            }
+
+            catch (Exception ex)
+            {
+                Global.LogMessage(ex.Message, Severity.ERROR);
             }
 
             return Task.CompletedTask;
@@ -274,13 +317,15 @@ namespace Jaxxis
 
                 Dataset.UserInsertOrUpdate(newUser);
             }
+
             catch (LinqToDBException ex)
             {
-                Global.ColoredConsoleMessage(ex.Message, ConsoleColor.Red);
+                Global.LogMessage(ex.Message, Severity.ERROR);
             }
+
             catch (Exception ex)
             {
-                Global.ColoredConsoleMessage(ex.Message, ConsoleColor.Red);
+                Global.LogMessage(ex.Message, Severity.ERROR);
             }
 
             return Task.CompletedTask;
@@ -289,21 +334,6 @@ namespace Jaxxis
         //User has left a guild
         public Task UserLeft(SocketGuildUser u)
         {
-            return Task.CompletedTask;
-        }
-
-        public Task LeftGuild (SocketGuild g)
-        {
-            Dataset.Guild newGuild = new Dataset.Guild
-            {
-                Guildid = g.Id.ToString(),
-                Guildname = g.Name,
-                Usercount = g.Users.Count,
-                IsActive = false,
-            };
-
-            Dataset.GuildInsertOrUpdate(newGuild);
-
             return Task.CompletedTask;
         }
     }

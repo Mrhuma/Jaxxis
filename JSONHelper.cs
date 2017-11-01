@@ -17,19 +17,17 @@ namespace Jaxxis
 
     public class JSONHelper
     {
-        static string filePath = @"..\..\Data\LocalData.json";
-
         //Write vars to json file
         public void JsonSerialize(HiddenData hiddenData)
         {
-            File.WriteAllText(filePath, JsonConvert.SerializeObject(hiddenData, Formatting.Indented, new JsonSerializerSettings {NullValueHandling = NullValueHandling.Include}));
+            File.WriteAllText(Global.filePath + "LocalData.json", JsonConvert.SerializeObject(hiddenData, Formatting.Indented, new JsonSerializerSettings {NullValueHandling = NullValueHandling.Include}));
 
         }
 
         //Read vars from Json file
         public HiddenData JsonDeserialize()
         {
-             return JsonConvert.DeserializeObject<HiddenData>(File.ReadAllText(filePath));
+             return JsonConvert.DeserializeObject<HiddenData>(File.ReadAllText(Global.filePath + "LocalData.json"));
         }
     }
 }
