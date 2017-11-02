@@ -1,5 +1,7 @@
 ﻿using System;
 using System.IO;
+using System.Net.Http;
+using System.Net.Http.Headers;
 
 namespace Jaxxis
 {
@@ -11,6 +13,8 @@ namespace Jaxxis
         public static string filePath = @"..\..\Data\";
         public static JSONHelper JsonHelper = new JSONHelper();
         public static HiddenData hiddenData;
+        public static HttpClient client = new HttpClient();
+        public const string url = "https://strawpoll.me/api/v2/polls/";
 
         public static void Initialize()
         {
@@ -18,11 +22,16 @@ namespace Jaxxis
 
             isFirstLaunch = hiddenData.IsFirstLaunch;
             botToken = hiddenData.BotToken;
+
+            //client.BaseAddress = new Uri(url);
+            //client.DefaultRequestHeaders.Accept.Clear();
+            //client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         }
 
         //Logs messages to console(with color coding) and writes to /Data/MessageLog.txt
         public static void LogMessage(string msg, Severity sev)
         {
+            string fileName = "MessageLog.txt";
             ConsoleColor color = ConsoleColor.White;
             //Based on severity, change console FG color
             try
@@ -31,20 +40,24 @@ namespace Jaxxis
                 {
                     case " Success":
                         color = ConsoleColor.Green;
+                        fileName = "MessageLog.txt";
                         break;
                     case "    Info":
                         color = ConsoleColor.White;
+                        fileName = "MessageLog.txt";
                         break;
                     case "   Error":
                         color = ConsoleColor.Red;
+                        fileName = "ErrorLog.txt";
                         break;
                     case "Critical":
                         color = ConsoleColor.DarkRed;
+                        fileName = "ErrorLog.txt";
                         break;
                 }
-                //Write message to /Data/MessageLog.txt
+                //Write message to fileName text file.
                 msg = $"{DateTime.Now.ToString()} [{sev}] {msg}";
-                File.AppendAllText(filePath + "MessageLog.txt", msg + Environment.NewLine);
+                File.AppendAllText(filePath + fileName, msg + Environment.NewLine);
             }
             //If message didn't write correctly, add text and change console color
             catch

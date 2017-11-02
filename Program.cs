@@ -30,19 +30,27 @@ namespace Jaxxis
             //Run FirstTimeLaunch if this is the first time the bot has been launched
             if (Global.isFirstLaunch)
             {
-                if (FirstTimeLaunch())
+                try
                 {
-                    string msg = " The first time launch completed successfully!";
-                    Global.LogMessage(msg, Severity.SUCCESS);
-                }
-                else
-                {
-                    string msg = "The first time launch was not successfully completed.";
-                    Global.LogMessage(msg, Severity.ERROR);
+                    if (FirstTimeLaunch())
+                    {
+                        string msg = "The first time launch completed successfully!";
+                        Global.LogMessage(msg, Severity.SUCCESS);
+                    }
+                    else
+                    {
+                        string msg = "The first time launch was not successfully completed.";
+                        Global.LogMessage(msg, Severity.ERROR);
+                    }
+
+                    Global.isFirstLaunch = false;
+                    //hiddenData.isFirstLaunch = false;
                 }
 
-                Global.isFirstLaunch = false;
-                //hiddenData.isFirstLaunch = false;
+                catch(Exception ex)
+                {
+                    Global.LogMessage(ex.Message, Severity.ERROR);
+                }
 
                 Global.JsonHelper.JsonSerialize(Global.hiddenData);
             }
@@ -246,11 +254,6 @@ namespace Jaxxis
                 Global.LogMessage($"I have been added to the {g.Name} Guild.", Severity.INFO);
             }
 
-            catch (LinqToDBException ex)
-            {
-                Global.LogMessage(ex.Message, Severity.ERROR);
-            }
-
             catch (Exception ex)
             {
                 Global.LogMessage(ex.Message, Severity.ERROR);
@@ -274,11 +277,6 @@ namespace Jaxxis
 
                 Dataset.GuildInsertOrUpdate(newGuild);
                 Global.LogMessage($"I have been kicked from the {g.Name} Guild.", Severity.INFO);
-            }
-
-            catch (LinqToDBException ex)
-            {
-                Global.LogMessage(ex.Message, Severity.ERROR);
             }
 
             catch (Exception ex)
@@ -316,11 +314,6 @@ namespace Jaxxis
                 };
 
                 Dataset.UserInsertOrUpdate(newUser);
-            }
-
-            catch (LinqToDBException ex)
-            {
-                Global.LogMessage(ex.Message, Severity.ERROR);
             }
 
             catch (Exception ex)
