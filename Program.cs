@@ -12,7 +12,9 @@ namespace Jaxxis
 {
     /* TODO
      *  - Strawpolls
-     *  - Siege Statistics
+     *  - Siege Stats
+     *  - Siege Op Selector
+     *  - Overwatch Stats
      */
 
     public class Program

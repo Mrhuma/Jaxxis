@@ -13,8 +13,6 @@ namespace Jaxxis
         public static string filePath = @"..\..\Data\";
         public static JSONHelper JsonHelper = new JSONHelper();
         public static HiddenData hiddenData;
-        public static HttpClient client = new HttpClient();
-        public const string url = "https://strawpoll.me/api/v2/polls/";
 
         public static void Initialize()
         {
@@ -22,10 +20,6 @@ namespace Jaxxis
 
             isFirstLaunch = hiddenData.IsFirstLaunch;
             botToken = hiddenData.BotToken;
-
-            //client.BaseAddress = new Uri(url);
-            //client.DefaultRequestHeaders.Accept.Clear();
-            //client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         }
 
         //Logs messages to console(with color coding) and writes to /Data/MessageLog.txt
