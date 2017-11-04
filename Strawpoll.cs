@@ -44,84 +44,145 @@ namespace Jaxxis
 
         public static async Task<Poll> GetPollAsync(int id)
         {
-            HttpResponseMessage resultJson;
-
-            using (var client = new HttpClient())
+            try
             {
-                resultJson = await client.GetAsync(strawpollUrl + @"/" + id);
+                HttpResponseMessage resultJson;
+
+                using (var client = new HttpClient())
+                {
+                    resultJson = await client.GetAsync(strawpollUrl + @"/" + id);
+                }
+
+                if (resultJson.StatusCode == System.Net.HttpStatusCode.NotFound)
+                {
+                    throw new Exception("No poll found by the id of " + id);
+                }
+
+                return JsonConvert.DeserializeObject<Poll>(await resultJson.Content.ReadAsStringAsync());
             }
-
-            Console.WriteLine(resultJson.Content.ToString());
-
-            return JsonConvert.DeserializeObject<Poll>(await resultJson.Content.ReadAsStringAsync());
+            
+            catch(Exception ex)
+            {
+                Global.LogMessage(ex.Message, Severity.ERROR);
+                return null;
+            }
+            
         }
 
         public static async Task<Poll> CreatePollAsync(PollRequest pollreq)
         {
-            HttpResponseMessage resultJson;
-            var jsondata = CreateRequest(pollreq);
-
-            using (var client = new HttpClient())
+            try
             {
-                var content = new StringContent(jsondata, Encoding.UTF8, "application/json");
-                resultJson = await client.PostAsync(strawpollUrl, content);
+                HttpResponseMessage resultJson;
+                var jsondata = CreateRequest(pollreq);
+
+                if(pollreq.Options.Count < 2)
+                {
+                    throw new Exception($"User attempted to create poll with {pollreq.Options.Count} option(s).");
+                }
+
+                using (var client = new HttpClient())
+                {
+                    var content = new StringContent(jsondata, Encoding.UTF8, "application/json");
+                    resultJson = await client.PostAsync(strawpollUrl, content);
+                }
+
+                return JsonConvert.DeserializeObject<Poll>(await resultJson.Content.ReadAsStringAsync());
             }
 
-            return JsonConvert.DeserializeObject<Poll>(await resultJson.Content.ReadAsStringAsync());
+            catch(Exception ex)
+            {
+                Global.LogMessage(ex.Message, Severity.ERROR);
+                return null;
+            }
+        }
+
+        public static async Task<Poll> CreatePollAsync(string title, List<string> options, bool multi = true, bool captcha = false)
+        {
+            try
+            {
+                HttpResponseMessage resultJson;
+                var jsondata = CreateRequest(title, options, multi, captcha);
+
+                if (options.Count < 2)
+                {
+                    throw new Exception($"User attempted to create poll with {options.Count} option(s).");
+                }
+
+                using (var client = new HttpClient())
+                {
+                    var content = new StringContent(jsondata, Encoding.UTF8, "application/json");
+                    resultJson = await client.PostAsync(strawpollUrl, content);
+                }
+
+                return JsonConvert.DeserializeObject<Poll>(await resultJson.Content.ReadAsStringAsync());
+            }
+
+            catch (Exception ex)
+            {
+                Global.LogMessage(ex.Message, Severity.ERROR);
+                return null;
+            }
         }
 
         internal static string CreateRequest(PollRequest req)
         {
-            JObject obj = new JObject
+            try
             {
-                {"title", req.Title},
-                {"options", new JArray(req.Options)},
-                {"multi", req.Multi ?? true }
-            };
+                JObject obj = new JObject
+                {
+                    {"title", req.Title},
+                    {"options", new JArray(req.Options)},
+                    {"multi", req.Multi ?? true }
+                };
 
-            switch (req.Dupcheck ?? DupCheck.NORMAL)
-            {
-                case DupCheck.NORMAL:
-                    obj.Add("dupcheck", "normal");
-                    break;
-                case DupCheck.PERMISSIVE:
-                    obj.Add("dupcheck", "permissive");
-                    break;
-                case DupCheck.DISABLED:
-                    obj.Add("dupcheck", "disabled");
-                    break;
+                switch (req.Dupcheck ?? DupCheck.NORMAL)
+                {
+                    case DupCheck.NORMAL:
+                        obj.Add("dupcheck", "normal");
+                        break;
+                    case DupCheck.PERMISSIVE:
+                        obj.Add("dupcheck", "permissive");
+                        break;
+                    case DupCheck.DISABLED:
+                        obj.Add("dupcheck", "disabled");
+                        break;
+                }
+
+                obj.Add("captcha", req.Captcha ?? false);
+
+                return obj.ToString();
             }
 
-            obj.Add("captcha", req.Captcha ?? false);
-
-            return obj.ToString();
+            catch(Exception ex)
+            {
+                Global.LogMessage(ex.Message, Severity.ERROR);
+                return null;
+            }
         }
 
-        internal static string CreateRequest(string title, List<string> options, bool multi = true, DupCheck dupcheck = DupCheck.NORMAL, bool capcha = false)
+        internal static string CreateRequest(string title, List<string> options, bool multi = true, bool captcha = false)
         {
-            JObject obj = new JObject
+            try
+            {
+                JObject obj = new JObject
             {
                 { "title", title },
                 { "options", new JArray(options) },
                 { "multi", multi }
             };
 
-            switch (dupcheck)
-            {
-                case DupCheck.NORMAL:
-                    obj.Add("dupcheck", "normal");
-                    break;
-                case DupCheck.PERMISSIVE:
-                    obj.Add("dupcheck", "permissive");
-                    break;
-                case DupCheck.DISABLED:
-                    obj.Add("dupcheck", "disabled");
-                    break;
+                obj.Add("dupcheck", "normal");
+                obj.Add("captcha", captcha);
+
+                return obj.ToString();
             }
 
-            obj.Add("captcha", capcha);
-
-            return obj.ToString();
+            catch(Exception ex)
+            {
+                Global.LogMessage(ex.Message, Severity.ERROR);
+                return null;
+            }
         }
     }
 }

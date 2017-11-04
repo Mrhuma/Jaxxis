@@ -1,7 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
-using System.Net.Http;
-using System.Net.Http.Headers;
+using System.Linq;
 
 namespace Jaxxis
 {
@@ -10,6 +10,9 @@ namespace Jaxxis
     {
         public static bool isFirstLaunch;
         public static string botToken = "";
+        public static List<string> AttOps;
+        public static List<string> DefOps;
+        public static List<string> AllOps;
         public static string filePath = @"..\..\Data\";
         public static JSONHelper JsonHelper = new JSONHelper();
         public static HiddenData hiddenData;
@@ -20,6 +23,10 @@ namespace Jaxxis
 
             isFirstLaunch = hiddenData.IsFirstLaunch;
             botToken = hiddenData.BotToken;
+            AttOps = hiddenData.AttOps;
+            DefOps = hiddenData.DefOps;
+            AllOps = DefOps;
+            AllOps.Concat(AttOps);
         }
 
         //Logs messages to console(with color coding) and writes to /Data/MessageLog.txt

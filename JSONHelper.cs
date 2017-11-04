@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Newtonsoft.Json;
 
 namespace Jaxxis
@@ -13,6 +9,8 @@ namespace Jaxxis
     {
         public bool IsFirstLaunch { get; set; }
         public string BotToken { get; set; }
+        public List<string> AttOps { get; set; }
+        public List<string> DefOps { get; set; }
     }
 
     public class JSONHelper

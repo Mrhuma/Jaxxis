@@ -258,7 +258,7 @@ namespace Jaxxis
 
             catch (Exception ex)
             {
-                Global.LogMessage(ex.Message, Severity.ERROR);
+                Global.LogMessage(ex.Message, Severity.CRITICAL);
             }
 
             return Task.CompletedTask;
@@ -283,7 +283,7 @@ namespace Jaxxis
 
             catch (Exception ex)
             {
-                Global.LogMessage(ex.Message, Severity.ERROR);
+                Global.LogMessage(ex.Message, Severity.CRITICAL);
             }
 
             return Task.CompletedTask;
@@ -320,7 +320,7 @@ namespace Jaxxis
 
             catch (Exception ex)
             {
-                Global.LogMessage(ex.Message, Severity.ERROR);
+                Global.LogMessage(ex.Message, Severity.CRITICAL);
             }
 
             return Task.CompletedTask;
