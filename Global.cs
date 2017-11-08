@@ -25,8 +25,6 @@ namespace Jaxxis
             botToken = hiddenData.BotToken;
             AttOps = hiddenData.AttOps;
             DefOps = hiddenData.DefOps;
-            AllOps = DefOps;
-            AllOps.Concat(AttOps);
         }
 
         //Logs messages to console(with color coding) and writes to /Data/MessageLog.txt
@@ -48,11 +46,11 @@ namespace Jaxxis
                         fileName = "MessageLog.txt";
                         break;
                     case "   Error":
-                        color = ConsoleColor.Red;
+                        color = ConsoleColor.Yellow;
                         fileName = "ErrorLog.txt";
                         break;
                     case "Critical":
-                        color = ConsoleColor.DarkRed;
+                        color = ConsoleColor.Red;
                         fileName = "ErrorLog.txt";
                         break;
                 }

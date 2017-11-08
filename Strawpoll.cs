@@ -106,7 +106,7 @@ namespace Jaxxis
 
                 if (options.Count < 2)
                 {
-                    throw new Exception($"User attempted to create poll with {options.Count} option(s).");
+                    throw new Exception($"User attempted to create poll with {options.Count} option.");
                 }
 
                 using (var client = new HttpClient())
