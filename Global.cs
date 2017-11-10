@@ -10,9 +10,11 @@ namespace Jaxxis
     {
         public static bool isFirstLaunch;
         public static string botToken = "";
-        public static List<string> AttOps;
-        public static List<string> DefOps;
-        public static List<string> AllOps;
+        public static string imageURL = "";
+        public static List<string> SiegeAttackOps;
+        public static List<string> SiegeDefenseOps;
+        public static List<string> SiegeCasualMapPool;
+        public static List<string> SiegeRankedMapPool;
         public static string filePath = @"..\..\Data\";
         public static JSONHelper JsonHelper = new JSONHelper();
         public static HiddenData hiddenData;
@@ -23,11 +25,14 @@ namespace Jaxxis
 
             isFirstLaunch = hiddenData.IsFirstLaunch;
             botToken = hiddenData.BotToken;
-            AttOps = hiddenData.AttOps;
-            DefOps = hiddenData.DefOps;
+            imageURL = hiddenData.ImageURL;
+            SiegeAttackOps = hiddenData.SiegeAttackOps;
+            SiegeDefenseOps = hiddenData.SiegeDefenseOps;
+            SiegeCasualMapPool = hiddenData.SiegeCasualMapPool;
+            SiegeRankedMapPool = hiddenData.SiegeRankedMapPool;
         }
 
-        //Logs messages to console(with color coding) and writes to /Data/MessageLog.txt
+        //Logs messages to console(with color coding) and writes to MessageLog/ErrorLog
         public static void LogMessage(string msg, Severity sev)
         {
             string fileName = "MessageLog.txt";
@@ -54,8 +59,55 @@ namespace Jaxxis
                         fileName = "ErrorLog.txt";
                         break;
                 }
-                //Write message to fileName text file.
+                //Write message to MessageLog/ErrorLog text file.
                 msg = $"{DateTime.Now.ToString()} [{sev}] {msg}";
+                File.AppendAllText(filePath + fileName, msg + Environment.NewLine);
+            }
+            //If message didn't write correctly, add text and change console color
+            catch
+            {
+                msg = "Failed to log - " + msg;
+                color = ConsoleColor.Red;
+            }
+            //Print message to console with assigned color
+            finally
+            {
+                var cc = Console.ForegroundColor;
+                Console.ForegroundColor = color;
+                Console.WriteLine(msg);
+                Console.ForegroundColor = cc;
+            }
+        }
+
+        public static void LogMessage(Exception ex, Severity sev)
+        {
+            string msg = "";
+            string fileName = "MessageLog.txt";
+            ConsoleColor color = ConsoleColor.White;
+            //Based on severity, change console FG color
+            try
+            {
+                switch (sev.ToString())
+                {
+                    case " Success":
+                        color = ConsoleColor.Green;
+                        fileName = "MessageLog.txt";
+                        break;
+                    case "    Info":
+                        color = ConsoleColor.White;
+                        fileName = "MessageLog.txt";
+                        break;
+                    case "   Error":
+                        color = ConsoleColor.Yellow;
+                        fileName = "ErrorLog.txt";
+                        break;
+                    case "Critical":
+                        color = ConsoleColor.Red;
+                        fileName = "ErrorLog.txt";
+                        break;
+                }
+                //Write message to fileName text file.
+                msg = $"{DateTime.Now.ToString()} [{sev}] {ex.Message}";
                 File.AppendAllText(filePath + fileName, msg + Environment.NewLine);
             }
             //If message didn't write correctly, add text and change console color

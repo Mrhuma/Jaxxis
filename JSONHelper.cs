@@ -9,8 +9,11 @@ namespace Jaxxis
     {
         public bool IsFirstLaunch { get; set; }
         public string BotToken { get; set; }
-        public List<string> AttOps { get; set; }
-        public List<string> DefOps { get; set; }
+        public string ImageURL { get; set; }
+        public List<string> SiegeAttackOps { get; set; }
+        public List<string> SiegeDefenseOps { get; set; }
+        public List<string> SiegeRankedMapPool { get; set; }
+        public List<string> SiegeCasualMapPool { get; set; }
     }
 
     public class JSONHelper

@@ -11,10 +11,13 @@ using Jaxxis.Database;
 namespace Jaxxis
 {
     /* TODO
-     *  - Strawpolls
      *  - Siege Stats
-     *  - Siege Op Selector
      *  - Overwatch Stats
+     *  - PUBG Stats
+     *  - CSGO Stats
+     *  - Diablo 3 Stats
+     *  - Destiny 2 Stats
+     *  - Commands for adding to siege maps & ops lists
      */
 
     public class Program

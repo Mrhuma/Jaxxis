@@ -13,7 +13,7 @@ namespace Jaxxis.Modules
     public class StrawpollModule : ModuleBase<CommandContext>
     {
         [Group("get")]
-        public class GetModule : ModuleBase<CommandContext>
+        public class StrawpollGetModule : ModuleBase<CommandContext>
         {
             [Command]
             public async Task PollGet(int num)
@@ -45,7 +45,7 @@ namespace Jaxxis.Modules
                     {
                         Color = Color.LightOrange,
                         Url = poll.PollUrl,
-                        ThumbnailUrl = "https://pbs.twimg.com/profile_images/737742455643070465/yNKcnrSA.jpg",
+                        ThumbnailUrl = $"{Global.imageURL}/Strawpoll/strawpollicon",
                         Title = poll.Title,
                         Fields = fields,
                         Footer = new EmbedFooterBuilder()
@@ -60,7 +60,7 @@ namespace Jaxxis.Modules
 
                 catch (Exception ex)
                 {
-                    Global.LogMessage(ex.Message, Severity.ERROR);
+                    Global.LogMessage(ex, Severity.ERROR);
                 }
             }
 
@@ -92,19 +92,23 @@ namespace Jaxxis.Modules
                         Fields = fields,
                     };
 
-                    await Context.Message.DeleteAsync();
+                    if (!Context.IsPrivate)
+                    {
+                        await Context.Message.DeleteAsync();
+                    };
+
                     await Context.User.SendMessageAsync("", embed: embeddedjson);
                 }
 
                 catch(Exception ex)
                 {
-                    Global.LogMessage(ex.Message, Severity.ERROR);
+                    Global.LogMessage(ex, Severity.ERROR);
                 }
             }
         }
 
         [Group("create")]
-        public class CreateModule : ModuleBase<CommandContext>
+        public class StrawpollCreateModule : ModuleBase<CommandContext>
         {
             [Command]
             public async Task PollCreate(string title, string options, bool multi = false, bool captcha = false)
@@ -137,7 +141,7 @@ namespace Jaxxis.Modules
                     {
                         Color = Color.LightOrange,
                         Url = poll.PollUrl,
-                        ThumbnailUrl = "https://pbs.twimg.com/profile_images/737742455643070465/yNKcnrSA.jpg",
+                        ThumbnailUrl = $"{Global.imageURL}/Strawpoll/strawpollicon",
                         Title = poll.Title,
                         Fields = fields,
                         Footer = new EmbedFooterBuilder()
@@ -152,7 +156,7 @@ namespace Jaxxis.Modules
 
                 catch (Exception ex)
                 {
-                    Global.LogMessage(ex.Message, Severity.ERROR);
+                    Global.LogMessage(ex, Severity.ERROR);
                 }
             }
 
@@ -186,13 +190,17 @@ namespace Jaxxis.Modules
                         Fields = fields,
                     };
 
-                    await Context.Message.DeleteAsync();
+                    if(!Context.IsPrivate)
+                    {
+                        await Context.Message.DeleteAsync();
+                    };
+
                     await Context.User.SendMessageAsync("", embed: embeddedjson);
                 }
 
                 catch(Exception ex)
                 {
-                    Global.LogMessage(ex.Message, Severity.ERROR);
+                    Global.LogMessage(ex, Severity.ERROR);
                 }
             }
         }
@@ -238,13 +246,17 @@ namespace Jaxxis.Modules
                     Fields = fields,
                 };
 
-                await Context.Message.DeleteAsync();
+                if (!Context.IsPrivate)
+                {
+                    await Context.Message.DeleteAsync();
+                };
+
                 await Context.User.SendMessageAsync("", embed: embeddedjson);
             }
 
             catch(Exception ex)
             {
-                Global.LogMessage(ex.Message, Severity.ERROR);
+                Global.LogMessage(ex, Severity.ERROR);
             }
         }
     }

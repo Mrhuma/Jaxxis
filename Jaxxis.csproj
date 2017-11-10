@@ -98,6 +98,7 @@
     <Compile Include="Global.cs" />
     <Compile Include="JSONHelper.cs" />
     <Compile Include="Modules\InfoModule.cs" />
+    <Compile Include="Modules\OwnerModule.cs" />
     <Compile Include="Modules\SiegeModule.cs" />
     <Compile Include="Modules\StrawpollModule.cs" />
     <Compile Include="Program.cs" />
