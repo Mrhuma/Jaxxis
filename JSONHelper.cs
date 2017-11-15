@@ -10,6 +10,7 @@ namespace Jaxxis
         public bool IsFirstLaunch { get; set; }
         public string BotToken { get; set; }
         public string ImageURL { get; set; }
+        public string PUBGApiKey { get; set; }
         public List<string> SiegeAttackOps { get; set; }
         public List<string> SiegeDefenseOps { get; set; }
         public List<string> SiegeRankedMapPool { get; set; }

@@ -13,11 +13,9 @@ namespace Jaxxis
     /* TODO
      *  - Siege Stats
      *  - Overwatch Stats
-     *  - PUBG Stats
      *  - CSGO Stats
      *  - Diablo 3 Stats
      *  - Destiny 2 Stats
-     *  - Commands for adding to siege maps & ops lists
      */
 
     public class Program

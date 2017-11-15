@@ -11,6 +11,7 @@ namespace Jaxxis
         public static bool isFirstLaunch;
         public static string botToken = "";
         public static string imageURL = "";
+        public static string PUBGApiKey = "";
         public static List<string> SiegeAttackOps;
         public static List<string> SiegeDefenseOps;
         public static List<string> SiegeCasualMapPool;
@@ -26,6 +27,7 @@ namespace Jaxxis
             isFirstLaunch = hiddenData.IsFirstLaunch;
             botToken = hiddenData.BotToken;
             imageURL = hiddenData.ImageURL;
+            PUBGApiKey = hiddenData.PUBGApiKey;
             SiegeAttackOps = hiddenData.SiegeAttackOps;
             SiegeDefenseOps = hiddenData.SiegeDefenseOps;
             SiegeCasualMapPool = hiddenData.SiegeCasualMapPool;
