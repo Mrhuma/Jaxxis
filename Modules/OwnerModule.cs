@@ -1,11 +1,10 @@
-﻿using System;
+﻿using Discord;
+using Discord.Commands;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using Discord;
-using Discord.Commands;
-using Newtonsoft.Json;
+using static Jaxxis.Strawpoll;
 
 namespace Jaxxis.Modules
 {
@@ -22,33 +21,42 @@ namespace Jaxxis.Modules
                 [Command("add")]
                 public async Task OwnerSiegeMapAdd(string mapname, string mappool = "c")
                 {
+                    await Task.Run(() => OwnerSiegeMapAddAsync(mapname, mappool).GetAwaiter());
+                }
+
+                public async Task OwnerSiegeMapAddAsync(string mapname, string mappool)
+                {
                     try
                     {
                         if (mappool.ToLower().StartsWith("r"))
                         {
                             Global.hiddenData.SiegeRankedMapPool.Add(mapname);
                         }
-
                         Global.hiddenData.SiegeCasualMapPool.Add(mapname);
                         Global.JsonHelper.JsonSerialize(Global.hiddenData);
                     }
 
-                    catch(Exception ex)
+                    catch (Exception ex)
                     {
-                        Global.LogMessage(ex, Severity.ERROR);
+                        await Global.LogError(ex);
                     }
                 }
 
                 [Command("remove")]
                 public async Task OwnerSiegeMapRemove(string mapname, string mappool = "c")
                 {
+                    await Task.Run(() => OwnerSiegeMapRemoveAsync(mapname, mappool).GetAwaiter());
+                }
+
+                public async Task OwnerSiegeMapRemoveAsync(string mapname, string mappool)
+                {
                     try
                     {
-                        if(mappool.ToLower().StartsWith("r"))
+                        if (mappool.ToLower().StartsWith("r"))
                         {
                             Global.hiddenData.SiegeRankedMapPool.Remove(mapname);
                         }
-                        else if(mappool.ToLower().StartsWith("c"))
+                        else if (mappool.ToLower().StartsWith("c"))
                         {
                             Global.hiddenData.SiegeCasualMapPool.Remove(mapname);
                         }
@@ -58,7 +66,7 @@ namespace Jaxxis.Modules
 
                     catch (Exception ex)
                     {
-                        Global.LogMessage(ex, Severity.ERROR);
+                        await Global.LogError(ex);
                     }
                 }
 
@@ -89,12 +97,12 @@ namespace Jaxxis.Modules
                             Fields = fields
                         };
 
-                        await Context.User.SendMessageAsync("", embed: embeddedjson);
+                        await Context.User.SendMessageAsync("", embed: embeddedjson.Build());
                     }
 
-                    catch(Exception ex)
+                    catch (Exception ex)
                     {
-                        Global.LogMessage(ex, Severity.ERROR);
+                        await Global.LogError(ex);
                     }
                 }
             }

@@ -10,7 +10,7 @@ namespace Jaxxis
 {
     class Strawpoll
     {
-        public const string strawpollUrl = "https://strawpoll.me/api/v2/polls";
+        public const string strawpollUrl = "https://www.strawpoll.me/api/v2/polls";
 
         public class Poll
         {
@@ -62,7 +62,7 @@ namespace Jaxxis
             
             catch(Exception ex)
             {
-                Global.LogMessage(ex.Message, Severity.ERROR);
+                await Global.LogMessage(ex.Message);
                 return null;
             }
             
@@ -75,14 +75,21 @@ namespace Jaxxis
                 HttpResponseMessage resultJson;
                 var jsondata = CreateRequest(pollreq);
 
-                if(pollreq.Options.Count < 2)
+                if (pollreq.Options.Count < 2)
                 {
-                    throw new Exception($"User attempted to create poll with {pollreq.Options.Count} option(s).");
+                    if (pollreq.Options.Count == 1)
+                    {
+                        throw new Exception($"User attempted to create poll with {pollreq.Options.Count} option.");
+                    }
+                    else
+                    {
+                        throw new Exception($"User attempted to create poll with {pollreq.Options.Count} options.");
+                    }
                 }
 
                 using (var client = new HttpClient())
                 {
-                    var content = new StringContent(jsondata, Encoding.UTF8, "application/json");
+                    var content = new StringContent(await jsondata, Encoding.UTF8, "application/json");
                     resultJson = await client.PostAsync(strawpollUrl, content);
                 }
 
@@ -91,12 +98,12 @@ namespace Jaxxis
 
             catch(Exception ex)
             {
-                Global.LogMessage(ex.Message, Severity.ERROR);
+                await Global.LogError(ex);
                 return null;
             }
         }
 
-        public static async Task<Poll> CreatePollAsync(string title, List<string> options, bool multi = true, bool captcha = false)
+        public static async Task<Poll> CreatePollAsync(string title, List<string> options, bool multi = false, bool captcha = false)
         {
             try
             {
@@ -105,13 +112,22 @@ namespace Jaxxis
 
                 if (options.Count < 2)
                 {
-                    throw new Exception($"User attempted to create poll with {options.Count} option.");
+                    if (options.Count == 1)
+                    {
+                        throw new Exception($"User attempted to create poll with {options.Count} option.");
+                    }
+                    else
+                    {
+                        throw new Exception($"User attempted to create poll with {options.Count} options.");
+                    }
                 }
 
                 using (var client = new HttpClient())
                 {
-                    var content = new StringContent(jsondata, Encoding.UTF8, "application/json");
+                    Console.WriteLine(jsondata.ToString());
+                    var content = new StringContent(await jsondata, Encoding.UTF8, "application/json");
                     resultJson = await client.PostAsync(strawpollUrl, content);
+                    Console.WriteLine(resultJson.RequestMessage);
                 }
 
                 return JsonConvert.DeserializeObject<Poll>(await resultJson.Content.ReadAsStringAsync());
@@ -119,12 +135,12 @@ namespace Jaxxis
 
             catch (Exception ex)
             {
-                Global.LogMessage(ex.Message, Severity.ERROR);
+                await Global.LogError(ex);
                 return null;
             }
         }
 
-        internal static string CreateRequest(PollRequest req)
+        internal static async Task<string> CreateRequest(PollRequest req)
         {
             try
             {
@@ -155,21 +171,21 @@ namespace Jaxxis
 
             catch(Exception ex)
             {
-                Global.LogMessage(ex.Message, Severity.ERROR);
+                await Global.LogError(ex);
                 return null;
             }
         }
 
-        internal static string CreateRequest(string title, List<string> options, bool multi = true, bool captcha = false)
+        internal static async Task<string> CreateRequest(string title, List<string> options, bool multi = true, bool captcha = false)
         {
             try
             {
                 JObject obj = new JObject
-            {
-                { "title", title },
-                { "options", new JArray(options) },
-                { "multi", multi }
-            };
+                {
+                    { "title", title },
+                    { "options", new JArray(options) },
+                    { "multi", multi }
+                };
 
                 obj.Add("dupcheck", "normal");
                 obj.Add("captcha", captcha);
@@ -177,9 +193,9 @@ namespace Jaxxis
                 return obj.ToString();
             }
 
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                Global.LogMessage(ex.Message, Severity.ERROR);
+                await Global.LogError(ex);
                 return null;
             }
         }
