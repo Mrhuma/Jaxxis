@@ -19,13 +19,15 @@ namespace Jaxxis
         public static string botToken = "";
         public static string imageURL = "";
         public static string PUBGApiKey = "";
+        public static string shortcutPath = "";
         public static string gameValue = "";
-        public static string filePath = @"..\..\Data\";
+        public static string filePath = @"..\Data\";
         public static List<HelpMessage> HelpMessageCache = new List<HelpMessage>();
         public static List<string> SiegeAttackOps;
         public static List<string> SiegeDefenseOps;
         public static List<string> SiegeCasualMapPool;
         public static List<string> SiegeRankedMapPool;
+        public static CommandService commands;
         public static Emoji emoji1 = new Emoji("1⃣");
         public static Emoji emoji2 = new Emoji("2⃣");
         public static Emoji emoji3 = new Emoji("3⃣");
@@ -46,6 +48,7 @@ namespace Jaxxis
 
             isFirstLaunch = hiddenData.IsFirstLaunch;
             botToken = hiddenData.BotToken;
+            shortcutPath = hiddenData.ShortcutPath;
             gameValue = "!help";
             imageURL = hiddenData.ImageURL;
             PUBGApiKey = hiddenData.PUBGApiKey;
@@ -70,7 +73,8 @@ namespace Jaxxis
             {
                 Message = Message,
                 StackTrace = StackTrace,
-                User = Username
+                User = Username,
+                Time = DateTime.Now
             };
             
             await Dataset.InsertErrorLog(newError);

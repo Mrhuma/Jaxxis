@@ -49,6 +49,9 @@ namespace Jaxxis.Database
 
             [Column(DataType = DataType.Text), Nullable]
             public string StackTrace { get; set; }
+
+            [Column(Length = 100)]
+            public DateTime Time { get; set; }
         }
 
         [Table(Name = "messagelog")]

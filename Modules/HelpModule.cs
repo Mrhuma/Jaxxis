@@ -18,8 +18,7 @@ namespace Jaxxis.Modules
         [Remarks("none")]
         public async Task Help()
         {
-            Program program = new Program();
-            await Task.Run(() => program.ReactionMenuStart(Context).GetAwaiter());
+            await Task.Run(() => new HelpMenu().ReactionMenuStart(Context).GetAwaiter());
         }
     }
 }
